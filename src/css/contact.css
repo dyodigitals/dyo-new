@@ -1,0 +1,844 @@
+/* ==========================================================================
+   Page lock — the whole contact experience is one viewport, never more.
+   ========================================================================== */
+
+html:has(.contact__page),
+body:has(.contact__page) {
+  height: 100%;
+  overflow: hidden;
+}
+
+.contact__page {
+  height: 100vh;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.contact__page .frame {
+  flex: 0 0 auto;
+}
+
+/* ==========================================================================
+   Base Contact Layout — left intro column, right form column
+   ========================================================================== */
+
+.contact {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--page-padding);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.contact__grid {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  align-items: stretch;
+  gap: clamp(2rem, 6vw, 5rem);
+  height: 100%;
+  max-height: 100%;
+}
+
+.contact__intro-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(0.9rem, 2.5svh, 1.5rem);
+  min-height: 0;
+}
+
+.contact__title {
+  font-family: var(--font-serif);
+  text-transform: none;
+  font-size: 8rem;
+  line-height: 1;
+  margin: 0;
+  font-weight: 400;
+  text-transform: capitalize;
+  font-style: italic;
+  /* Inverts against the gradient/background behind it, like .scene__title */
+  color: #1e1e1e;
+  mix-blend-mode: difference;
+}
+
+.contact__intro {
+  margin: 0;
+  line-height: 150%;
+  max-width: 68ch;
+  font-size: 0.95rem;
+  font-family:var(--font-sans);
+  text-transform: capitalize;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  opacity: 80%;
+  font-style: italic;
+  
+}
+
+.contact__email {
+  display: inline-block;
+  align-self: flex-start;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: clamp(0.75rem, 2svh, 1rem);
+  color: var(--color-text);
+  text-decoration: none;
+  padding-bottom: 0.15rem;
+  margin-top: 1rem;
+  
+}
+
+/* Sweep-in underline, same motion language as the "Back to work" .line link */
+.contact__email::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.4s ease;
+}
+
+.contact__email:hover::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Only the underline should react on hover, not the global link dulling */
+.contact__email:hover {
+  color: var(--color-text);
+}
+
+.contact__social {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: -0.25rem;
+}
+
+.contact__social a {
+  color: var(--color-text);
+  opacity: 0.75;
+  transition: opacity 0.3s ease;
+}
+
+.contact__social a:hover {
+  opacity: 1;
+}
+
+.contact__social svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.contact__gradient {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Form Column
+   ========================================================================== */
+.contact__form-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding-right: 0.25rem;
+  justify-content: center;
+}
+
+.contact__form {
+  /* Centers when it fits; the margin collapses to 0 and the column above
+     scrolls instead of clipping when the form is taller than the viewport. */
+  margin: auto 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3.6svh, 2.3rem);
+}
+
+.form__row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.1rem, 2.6svh, 1.9rem);
+}
+
+@media (min-width: 600px) {
+  .form__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.contact__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text);
+  opacity: 0.8;
+  position: relative;
+}
+
+.contact__field input,
+.contact__field textarea,
+.contact__field select {
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(33, 29, 26, 0.18);
+  padding: 0.4rem 0;
+  text-transform: none;
+  letter-spacing: normal;
+  border-radius: 0;
+  transition: border-color 0.3s ease;
+  resize: vertical;
+}
+
+.contact__field input:focus,
+.contact__field textarea:focus,
+.contact__field select:focus {
+  outline: none;
+  border-bottom-color: rgba(33, 29, 26, 0);
+}
+
+.contact__field input::placeholder,
+.contact__field textarea::placeholder {
+  color: rgba(33, 29, 26, 0.3);
+}
+
+/* Animated focus underline — grows from center under the field on focus */
+.contact__field::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.5px;
+  background: var(--color-text);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.contact__field:focus-within::after {
+  transform: scaleX(1);
+}
+
+/* The Budget dropdown keeps its own glass styling — no underline on focus */
+.contact__field:has(.glass-select)::after {
+  display: none;
+}
+
+/* Fix autofill forcing a white/blue field background */
+.contact__field input:-webkit-autofill,
+.contact__field input:-webkit-autofill:hover,
+.contact__field input:-webkit-autofill:focus,
+.contact__field textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--color-text);
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+  box-shadow: 0 0 0px 1000px transparent inset;
+  caret-color: var(--color-text);
+  transition: background-color 600000s ease-in-out 0s;
+}
+
+.contact__field input:autofill {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   Niche Selection (pills)
+   ========================================================================== */
+.contact__niche {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.contact__niche legend {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: clamp(0.6rem, 1.5svh, 1rem);
+  opacity: 0.8;
+}
+
+.niche__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.pill input[type="radio"] {
+  display: none;
+}
+
+/* "Other" craft field — hidden until the Other pill is checked */
+.niche__other {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-4px);
+  margin-top: 0;
+  transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.35s ease, margin-top 0.35s ease;
+}
+
+.contact__niche:has(input[value="other"]:checked) .niche__other,
+.niche__other.is-visible {
+  max-height: 5.5rem;
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: clamp(0.75rem, 2svh, 1.25rem);
+}
+
+/* ==========================================================================
+   Glass Effect Foundation
+   ========================================================================== */
+.glass-effect {
+  -webkit-backdrop-filter: saturate(120%) blur(0.75em);
+  backdrop-filter: saturate(120%) blur(0.75em);
+  pointer-events: none;
+  isolation: isolate;
+  color: #201d1d;
+  border-radius: inherit;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.glass-effect__fill {
+  opacity: 1;
+  border-radius: inherit;
+  background-color: #d4d4d426;
+  position: absolute;
+  inset: 0;
+  transition: background-color 0.35s ease;
+}
+.glass-effect__fill-burn {
+  opacity: 0.05;
+  mix-blend-mode: color-burn;
+  border-radius: inherit;
+  background-color: currentColor;
+  position: absolute;
+  inset: 0;
+}
+.glass-effect__highlight-soft {
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+  position: absolute;
+  inset: 0;
+  box-shadow: inset -0.28125em -0.28125em 0.09375em -0.328125em #ffffff80;
+}
+.glass-effect__highlight-strong {
+  border-radius: inherit;
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0.28125em 0.28125em 0.09375em -0.328125em #fffc;
+}
+.glass-effect__edge-light {
+  border-radius: inherit;
+  mix-blend-mode: plus-lighter;
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0.1875em 0.28125em 0.09375em -0.1875em #b3b3b380;
+}
+.glass-effect__edge-dark {
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+  position: absolute;
+  inset: 0;
+  box-shadow: inset -0.1875em -0.28125em 0.09375em -0.1875em #b3b3b34d;
+  transition: box-shadow 0.35s ease;
+}
+.glass-effect__inner-glow {
+  mix-blend-mode: darken;
+  border-radius: inherit;
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 1.75em #f2f2f24d;
+  transition: box-shadow 0.35s ease;
+}
+
+/* ==========================================================================
+   Glass Wrapper — Interactive States
+   ========================================================================== */
+.glass-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.35rem, 0.8svh, 0.5rem) clamp(1rem, 2vw, 1.5rem);
+  border-radius: 50em;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+}
+
+.pill-text {
+  position: relative;
+  z-index: 2;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+  color: var(--color-text);
+  transition: font-weight 0.2s ease;
+  font-family: var(--font-sans);
+  letter-spacing: -0.02em;
+}
+.pill-text-submit {
+  font-size: 1rem;
+  font-family: var(--font-serif);
+  text-transform: capitalize;
+}
+/* Soft lift + glow on hover, in place of the shimmer sweep */
+.glass-wrapper:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -8px rgba(33, 29, 26, 0.22);
+}
+
+.glass-wrapper:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: none;
+}
+
+.glass-wrapper:hover .glass-effect__fill {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.glass-wrapper:hover .glass-effect__inner-glow {
+  box-shadow: inset 0 0 2em rgba(255, 255, 255, 0.5);
+}
+
+.glass-wrapper:hover .glass-effect__edge-dark {
+  box-shadow: inset -0.1875em -0.28125em 0.09375em -0.1875em #b3b3b333;
+}
+
+/* Keyboard focus ring (inputs are visually hidden, so style the sibling) */
+.pill input:focus-visible + .glass-wrapper,
+.glass-select__trigger:focus-visible,
+button.contact__submit:focus-visible {
+  outline: 2px solid rgba(33, 29, 26, 0.35);
+  outline-offset: 3px;
+}
+
+/* Selected state for radio pills */
+.pill input[type="radio"]:checked + .glass-wrapper .glass-effect__inner-glow {
+  box-shadow: inset 0 0 1.75em rgba(255, 255, 255, 0.6);
+}
+
+.pill input[type="radio"]:checked + .glass-wrapper .pill-text {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Submit button specific overrides */
+button.contact__submit {
+  align-self: flex-start;
+  margin-top: clamp(0.4rem, 1.2svh, 0.75rem);
+  padding-inline: 2rem;
+ 
+}
+
+/* ==========================================================================
+   Glass Select (custom "Anticipated Budget" dropdown)
+   ========================================================================== */
+.glass-select {
+  position: relative;
+  width: 100%;
+}
+
+.glass-select__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-inline: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.glass-select__value {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.glass-select__value.is-placeholder {
+  opacity: 0.45;
+  font-weight: 400;
+}
+
+.glass-select__chevron {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  color: var(--color-text);
+  opacity: 0.6;
+  transition: transform 0.3s ease;
+}
+
+.glass-select.is-open .glass-select__chevron {
+  transform: rotate(180deg);
+}
+
+.glass-select__panel {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 0;
+  padding: 0.4rem;
+  list-style: none;
+  border-radius: 1.25rem;
+  background-color: rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: saturate(140%) blur(1.1em);
+  backdrop-filter: saturate(140%) blur(1.1em);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6), inset 0 -1px 1px rgba(255, 255, 255, 0.2),
+    0 14px 34px -10px rgba(33, 29, 26, 0.28);
+  transform-origin: top center;
+  animation: glass-select-in 0.22s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+@keyframes glass-select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.glass-select__option {
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.9rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.glass-select__option.is-focused,
+.glass-select__option:hover {
+  background-color: rgba(255, 255, 255, 0.55);
+}
+
+.glass-select__option[aria-selected="true"] {
+  font-weight: 700;
+}
+
+.glass-select__error {
+  display: none;
+  margin: 0.5rem 0 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: #a8453a;
+}
+
+.glass-select.is-invalid .glass-select__trigger {
+  animation: glass-select-shake 0.3s ease;
+}
+
+.glass-select.is-invalid .glass-select__error {
+  display: block;
+}
+
+@keyframes glass-select-shake {
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+/* ==========================================================================
+   Responsive — stack the columns; the page stays pinned to one viewport,
+   the form column becomes the scroll region if content runs long.
+   ========================================================================== */
+@media (max-width: 899px) {
+  .contact {
+    align-items: flex-start;
+    /* Clears the fixed header's logo so the stacked heading never collides with it */
+    padding-top: calc(var(--page-padding) + clamp(40px, 9vw, 64px) + 0.75rem);
+    padding-bottom: clamp(1rem, 2.6svh, 1.75rem);
+  }
+
+  .contact__grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: clamp(0.5rem, 1.2svh, 0.9rem);
+  }
+
+  .contact__intro-col {
+    justify-content: flex-start;
+    gap: 1rem;
+  }
+
+  .contact__title {
+    font-size: clamp(2rem, 7svh, 3.25rem);
+  }
+
+  .contact__intro {
+    display: none;
+  }
+
+  .contact__email {
+    margin-top: 0.25rem;
+  }
+
+  .contact__form-col {
+    overflow-y: auto;
+  }
+}
+
+/* Tablet — width is no longer the constraint, so the title can breathe more */
+@media (min-width: 600px) and (max-width: 899px) {
+  .contact__title {
+    font-size: clamp(2.25rem, 8svh, 3.75rem);
+  }
+
+  .niche__pills {
+    gap: 0.75rem;
+  }
+}
+
+/* Mobile — every field stacks full-width, so trim what the tightest budget needs */
+@media (max-width: 599px) {
+  .contact {
+    padding-top: 6rem;
+  }
+
+  .contact__grid {
+    gap: 0rem;
+  }
+
+  .contact__title {
+    font-size: clamp(1.5rem, 5.5svh, 2.1rem);
+  }
+
+  /* Collapses the first line break so the heading wraps to 2 lines instead of 3 */
+  .contact__title-break {
+    display: none;
+  }
+
+  .contact__form {
+    gap: clamp(0.85rem, 2.2svh, 1.25rem);
+    margin-top: 2rem;
+  }
+
+  .form__row {
+    gap: clamp(0.65rem, 1.6svh, 1rem);
+  }
+
+  .contact__field {
+    gap: 0.4rem;
+  }
+
+  .niche__pills {
+    gap: 0.45rem;
+  }
+
+  .glass-wrapper {
+    padding: clamp(0.3rem, 0.9svh, 0.4rem) clamp(0.8rem, 4vw, 1.1rem);
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .glass-wrapper,
+  .contact__field::after,
+  .glass-select__panel,
+  .glass-select__chevron,
+  .niche__other,
+  .glass-select.is-invalid .glass-select__trigger {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.contact__status {
+  margin: 0;
+  min-height: 1em;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.contact__status.is-visible { opacity: 1; }
+.contact__status.is-error { color: #a8453a; }
+
+button.contact__submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* ==========================================================================
+   Sent modal
+   ========================================================================== */
+.sent-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.sent-modal[hidden] { display: none; }
+.sent-modal.is-open { opacity: 1; }
+
+.sent-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(236, 231, 224, 0.35);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  backdrop-filter: blur(14px) saturate(120%);
+}
+
+.sent-modal__card {
+  position: relative;
+  width: min(92vw, 460px);
+  border-radius: 2rem;
+  transform: translateY(18px) scale(0.97);
+  transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.25, 1);
+  box-shadow: 0 30px 80px -24px rgba(33, 29, 26, 0.35);
+}
+
+.sent-modal.is-open .sent-modal__card { transform: none; }
+
+/* A touch more body than the small pills so text stays readable */
+.sent-modal__card > .glass-effect .glass-effect__fill {
+  background-color: rgba(255, 255, 255, 0.38);
+}
+
+.sent-modal__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2.75rem 2.25rem 2.25rem;
+  color: var(--color-text);
+}
+
+.sent-modal__check {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 1.5rem;
+}
+
+.sent-modal__check circle,
+.sent-modal__check path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.sent-modal.is-open .sent-modal__check circle {
+  animation: sent-draw 0.9s 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.sent-modal.is-open .sent-modal__check path {
+  animation: sent-draw 0.5s 0.85s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes sent-draw { to { stroke-dashoffset: 0; } }
+
+.sent-modal__eyebrow {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.sent-modal__title {
+  margin: 0 0 1rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2.2rem, 6vw, 3rem);
+  line-height: 1.05;
+}
+
+.sent-modal__text {
+  margin: 0 0 2rem;
+  max-width: 34ch;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  opacity: 0.75;
+}
+
+/* Staggered reveal of the content */
+.sent-modal__eyebrow,
+.sent-modal__title,
+.sent-modal__text,
+.sent-modal__close {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+.sent-modal.is-open .sent-modal__eyebrow { opacity: 0.6; transform: none; transition-delay: 0.45s; }
+.sent-modal.is-open .sent-modal__title   { opacity: 1;   transform: none; transition-delay: 0.55s; }
+.sent-modal.is-open .sent-modal__text    { opacity: 0.75; transform: none; transition-delay: 0.65s; }
+.sent-modal.is-open .sent-modal__close   { opacity: 1;   transform: none; transition-delay: 0.75s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sent-modal,
+  .sent-modal__card,
+  .sent-modal__eyebrow,
+  .sent-modal__title,
+  .sent-modal__text,
+  .sent-modal__close {
+    transition: none !important;
+    transition-delay: 0s !important;
+  }
+  .sent-modal__check circle,
+  .sent-modal__check path {
+    animation: none !important;
+    stroke-dashoffset: 0;
+  }
+}

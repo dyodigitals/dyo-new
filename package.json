@@ -1,0 +1,20 @@
+{
+  "name": "dyo-digitals",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.3.0",
+    "vite-plugin-glsl": "^1.6.1"
+  },
+  "dependencies": {
+    "gsap": "^3.15.0",
+    "shaders": "^3.2.470",
+    "three": "^0.186.0"
+  }
+}

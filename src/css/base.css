@@ -1,0 +1,510 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+:root {
+  font-size: 14px;
+  --color-text: #211d1a;
+  --color-bg: #f5f1ea;
+  --color-link: #211d1a;
+  --color-link-hover: rgba(33, 29, 26, 0.55);
+  --page-padding: clamp(0.75rem, 3vw, 1.5rem);
+  --aspect: 4/5;
+  --grid-item-height: 20vh;
+  --c-gap: clamp(1rem, 4vw, 3rem);
+  --r-gap: 3rem;
+  --column: 80px;
+  --column-count: 3;
+  --border-radius: 4px;
+  --font-serif: "Instrument Serif", serif;
+  --font-sans: "Inter", sans-serif;
+  --carousel-w: clamp(220px, 55vw, 400px);
+  --carousel-h: clamp(275px, 68.75vw, 500px);
+  /* Live-updated by background/index.js to match the current project mood;
+     falls back to the first mood color on pages (e.g. contact.html) that never ran it */
+  --mood-bg: #fce8e9;
+}
+
+html {
+  height: 100%;
+  overflow-x: hidden;
+  /* Fallback paint sits below the fixed .webgl canvas (z-index: -1) */
+  background-color: var(--color-bg);
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--color-text);
+  /* Transparent so the WebGL shader canvas behind it is visible */
+  background-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (scripting: enabled) {
+  .loading {
+    &::before,
+    &::after {
+      content: "";
+      position: fixed;
+      z-index: 10000;
+    }
+
+    &::before {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--color-bg);
+    }
+
+    &::after {
+      top: 50%;
+      left: 50%;
+      width: 100px;
+      height: 1px;
+      margin: 0 0 0 -50px;
+      background: var(--color-link);
+      animation: loaderAnim 1.5s ease-in-out infinite alternate forwards;
+    }
+  }
+}
+
+@keyframes loaderAnim {
+  0% {
+    transform: scaleX(0);
+    transform-origin: 0% 50%;
+  }
+
+  50% {
+    transform: scaleX(1);
+    transform-origin: 0% 50%;
+  }
+
+  50.1% {
+    transform: scaleX(1);
+    transform-origin: 100% 50%;
+  }
+
+  100% {
+    transform: scaleX(0);
+    transform-origin: 100% 50%;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: var(--color-link);
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    text-decoration: none;
+    color: var(--color-link-hover);
+  }
+
+  &:focus {
+    outline: none;
+    background: lightgrey;
+
+    &:not(:focus-visible) {
+      background: transparent;
+    }
+
+    &:focus-visible {
+      outline: 2px solid red;
+      background: transparent;
+    }
+  }
+}
+
+.line {
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+  vertical-align: top;
+
+  &::before {
+    background: var(--color-link-hover);
+    bottom: 0;
+    content: "";
+    height: 1px;
+    left: 0;
+    position: absolute;
+    transition: transform 0.4s ease;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: right center;
+  }
+
+  &:hover::before {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+}
+
+.frame {
+  display: grid;
+  z-index: 1000;
+  width: 100%;
+  /* svh avoids the oversized box mobile browsers build with plain 100vh, which
+     pushed the bottom row (about text/social icons) below the visible viewport
+     and created a large phantom gap under them compared to the top row */
+  height: 100vh;
+  height: 100svh;
+  position: fixed;
+  grid-column-gap: var(--c-gap);
+  grid-row-gap: 0.5rem;
+  pointer-events: none;
+  justify-items: start;
+  padding: var(--page-padding);
+  padding-top: max(var(--page-padding), env(safe-area-inset-top));
+  padding-bottom: max(var(--page-padding), env(safe-area-inset-bottom));
+  padding-left: max(var(--page-padding), env(safe-area-inset-left));
+  padding-right: max(var(--page-padding), env(safe-area-inset-right));
+  align-content: space-between;
+  justify-content: space-between;
+  align-items: start;
+  grid-template-areas: "title links" "tags sponsor";
+  /* Solid color (not blend-mode) so header text stays a deliberate, readable color;
+     toggled dark/light by background/index.js based on the current mood's luminance.
+     All frame text reads --frame-color with the same transition so it changes in lockstep. */
+  --frame-color: var(--color-text);
+
+  a,
+  button {
+    pointer-events: auto;
+    color: var(--frame-color);
+    transition: color 0.4s ease;
+  }
+
+  .frame__title {
+    font-size: inherit;
+    margin: 0;
+    font-weight: inherit;
+    grid-area: title;
+    text-align: left;
+  }
+
+  .frame__title .logo {
+    height: clamp(40px, 9vw, 64px);
+    width: auto;
+    display: block;
+    color: inherit; /* resolves to currentColor for the SVG paths */
+  }
+
+  .frame__title a {
+  display: block;
+  line-height: 0; /* kills descender gap under inline SVG */
+}
+
+  .frame__links {
+    grid-area: links;
+    justify-self: end;
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .frame__about {
+    grid-area: tags;
+    max-width: min(320px, 42vw);
+    font-size: 0.75rem;
+    line-height: 150%;
+    text-transform: none;
+    color: var(--frame-color);
+    transition: color 0.4s ease;
+  }
+
+  .frame__social {
+    grid-area: sponsor;
+    justify-self: end;
+    align-self: end;
+    display: flex;
+    gap: 0.75rem;
+    align-items: end;
+    color: var(--frame-color);
+    transition: color 0.4s ease;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+  }
+
+  &.frame--footer {
+    display: flex;
+    min-height: 300px;
+    align-items: end;
+    justify-content: space-between;
+  }
+}
+
+.frame__title .logo path,
+.frame__title .logo rect {
+  fill: currentColor;
+}
+
+body.theme-dark .frame {
+  --frame-color: #fff;
+}
+
+/* Osmo "curved wipe" page transition, shared by index.html and contact.html.
+   Sits above .frame (z-index: 1000) so the wipe fully covers the fixed header. */
+.transition {
+  z-index: 1100;
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  overflow: clip;
+}
+
+.transition__panel {
+  color: var(--mood-bg);
+  background-color: currentColor;
+  transition: color 0.4s ease;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  position: absolute;
+  top: 100%;
+  left: 0;
+}
+
+.transition__panel-top {
+  transform-origin: bottom;
+  flex-flow: column;
+  align-items: center;
+  width: 100%;
+  height: 0%;
+  display: flex;
+  position: absolute;
+  bottom: calc(100% - 1px);
+  left: 0;
+  overflow: hidden;
+}
+
+.transition__panel-bottom {
+  transform-origin: top;
+  flex-flow: column;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  height: 0%;
+  display: flex;
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 0;
+  overflow: hidden;
+}
+
+.transition__panel-circle {
+  aspect-ratio: auto;
+  background-color: currentColor;
+  border-radius: 50%;
+  width: 125%;
+  height: 500%;
+  position: absolute;
+}
+
+.transition__logo {
+  color: var(--color-text);
+  opacity: 0;
+  width: 5em;
+  display: flex;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  overflow: hidden;
+  transform: translate(-50%, -50%);
+}
+
+.transition__logo path,
+.transition__logo rect {
+  fill: currentColor;
+}
+
+@media (max-width: 640px) {
+  .transition__logo {
+    width: 3.5em;
+  }
+}
+
+@media (max-width: 640px) {
+  .frame {
+    grid-row-gap: 0.35rem;
+  }
+
+  .frame__about {
+    max-width: min(220px, 56vw);
+    font-size: 0.68rem;
+  }
+
+  .frame__social {
+    gap: 0.6rem;
+  }
+
+  :root {
+    --carousel-w: clamp(300px, 85vw, 460px);
+    --carousel-h: clamp(375px, 106.25vw, 575px);
+  }
+
+  .scene__kicker {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+  }
+}
+
+.scene {
+  perspective: clamp(700px, 110vw, 900px);
+  position: relative;
+  /* svh keeps this box matched to what's actually visible on load, so the
+     carousel (centered against this box below) is truly centered on mobile */
+  height: 100vh;
+  height: 100svh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.scene__heading {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.4rem, 1.5vw, 0.75rem);
+}
+
+.scene__kicker {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: clamp(0.7rem, 1vw, 0.8rem);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: #fff;
+  mix-blend-mode: difference;
+}
+
+.scene__title {
+  position: relative;
+  z-index: 10;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 4vw, 3.25rem);
+  letter-spacing: 0.01em;
+  /* Inverts against whatever is behind it so the heading stays legible on any background */
+  mix-blend-mode: difference;
+  color: #fff;
+  font-weight: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.4rem, 1.5vw, 0.75rem);
+}
+
+.scene__title a {
+  display: block;
+  color: inherit;
+}
+
+.scene__title span {
+  display: inline-block;
+}
+
+.scene__title .char {
+  display: inline-block;
+  transform-style: preserve-3d;
+  transform-origin: 50% 0%;
+}
+
+.carousel {
+  width: var(--carousel-w);
+  height: var(--carousel-h);
+  top: 50%;
+  left: 50%;
+  margin: calc(var(--carousel-h) / -2) 0 0 calc(var(--carousel-w) / -2);
+  position: absolute;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transform: translateZ(-550px) rotateY(0deg);
+}
+
+.scene:nth-child(even) .carousel {
+  transform: translateZ(-550px) rotateY(45deg);
+}
+
+.carousel__cell {
+  position: absolute;
+  width: calc(var(--carousel-w) * 1.05);
+  aspect-ratio: 4/5;
+  left: 0;
+  top: 0;
+  transform-style: preserve-3d;
+  
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.card__face {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  backface-visibility: hidden;
+  background-image: var(--img);
+  background-size: cover;
+  border-radius: var(--border-radius);
+}
+
+.card__face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card__face--back {
+  transform: rotateY(180deg);
+}
+
+/* Short viewports (landscape phones, or a short/rotated browser window):
+   gated on height, not width, since the desktop-size carousel + heading text
+   otherwise overflows a short screen regardless of how wide it is.
+   Placed last so it wins the cascade over the base/max-width rules above. */
+@media (max-height: 480px) {
+  .scene {
+    height: auto;
+    min-height: 100svh;
+    padding-block: clamp(2.5rem, 10vh, 4rem);
+  }
+
+  :root {
+    --carousel-w: clamp(180px, 42vh, 260px);
+    --carousel-h: clamp(225px, 52.5vh, 325px);
+  }
+
+  /* Vertically centered title sits close to the fixed frame's bottom row on
+     a short screen, so both shrink here to keep clear air between them */
+  .scene__title {
+    font-size: clamp(1.4rem, 6vh, 2.25rem);
+  }
+
+  .frame__about {
+    max-width: min(200px, 46vw);
+    font-size: 0.62rem;
+  }
+}
