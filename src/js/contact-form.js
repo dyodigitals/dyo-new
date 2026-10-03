@@ -3,12 +3,18 @@
 // 2. Reveals + requires the "Tell us your craft" field when "Other" is picked.
 // 3. Blocks submit with a visible error if the budget select is left empty.
 
-document.addEventListener("DOMContentLoaded", () => {
+function init() {
   initGlassSelects();
   initNicheOther();
   initSubmitGuard();
   initSentModal();
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
 
 function initGlassSelects() {
   document.querySelectorAll("[data-glass-select]").forEach((root) => {
