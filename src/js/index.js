@@ -1,6 +1,5 @@
 // Import utility function for preloading images
-import { preloadImages } from './utils.js';
-
+import { preloadImages } from "./utils.js";
 
 // Register the GSAP plugins
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother, ScrollToPlugin, SplitText);
@@ -41,7 +40,7 @@ const getCarouselCellTransforms = (count, radius) => {
 const RADIUS_TO_WIDTH_RATIO = 500 / 410;
 
 const setupCarouselCells = (carousel) => {
-  const cells = carousel.querySelectorAll('.carousel__cell');
+  const cells = carousel.querySelectorAll(".carousel__cell");
   if (!cells.length) return;
 
   const cellWidth = cells[0].offsetWidth; // actual rendered width right now
@@ -60,20 +59,24 @@ const setupCarouselCells = (carousel) => {
  * @returns {GSAPTimeline} Scroll-driven animation timeline
  */
 const createScrollAnimation = (carousel) => {
-  const wrapper = carousel.closest('.scene');
-  const cards = carousel.querySelectorAll('.card');
-  const titleSpan = wrapper.querySelector('.scene__title span');
+  const wrapper = carousel.closest(".scene");
+  const cards = carousel.querySelectorAll(".card");
+  const titleSpan = wrapper.querySelector(".scene__title span");
   const split = splitMap.get(titleSpan);
   const chars = split?.chars || [];
 
   // Create scroll-driven timeline
   const timeline = gsap.timeline({
-    defaults: { ease: 'sine.inOut' },
+    defaults: { ease: "sine.inOut" },
     scrollTrigger: {
       trigger: wrapper,
-      start: 'top bottom', // Start when top of wrapper hits bottom of viewport
-      end: 'bottom top', // End when bottom of wrapper hits top of viewport
-      scrub: true, // Smooth animation based on scroll position
+      // Progress is 0.5 exactly when the scene's center meets the viewport's center.
+      // Identical to 'top top' based positions when scene height == viewport height
+      // (desktop), but stays centered on mobile if the two differ slightly.
+      start: () => `center center+=${wrapper.offsetHeight}`,
+      end: () => `center center-=${wrapper.offsetHeight}`,
+      scrub: true,
+      invalidateOnRefresh: true,
     },
   });
 
@@ -83,10 +86,10 @@ const createScrollAnimation = (carousel) => {
       carousel,
       { rotationZ: 3, rotationX: 3 },
       { rotationZ: -3, rotationX: -3 },
-      0
+      0,
     ) // Subtle 3D tilt
-    
-    .fromTo(cards, { rotationZ: 10 }, { rotationZ: -10, ease: 'none' }, 0); // Rotate cards around Z
+
+    .fromTo(cards, { rotationZ: 10 }, { rotationZ: -10, ease: "none" }, 0); // Rotate cards around Z
 
   // Animate title characters in on scroll
   if (chars.length > 0) {
@@ -96,14 +99,14 @@ const createScrollAnimation = (carousel) => {
       {
         autoAlpha: 1,
         duration: 0.02,
-        ease: 'none',
-        stagger: { each: 0.04, from: 'start' },
+        ease: "none",
+        stagger: { each: 0.04, from: "start" },
         scrollTrigger: {
           trigger: wrapper,
-          start: 'top center',
-          toggleActions: 'play none none reverse',
+          start: "top center",
+          toggleActions: "play none none reverse",
         },
-      }
+      },
     );
   }
 
@@ -116,10 +119,10 @@ const createScrollAnimation = (carousel) => {
  * @returns {void}
  */
 const initTextsSplit = () => {
-  document.querySelectorAll('.scene__title span').forEach((span) => {
+  document.querySelectorAll(".scene__title span").forEach((span) => {
     const split = SplitText.create(span, {
-      type: 'chars', // Split by characters
-      charsClass: 'char', // Assign class to each character
+      type: "chars", // Split by characters
+      charsClass: "char", // Assign class to each character
       autoSplit: true, // Revert and re-split whenever the fonts finish loading
     });
     splitMap.set(span, split); // Store split instance for reuse
@@ -132,7 +135,7 @@ const initTextsSplit = () => {
  * @returns {void}
  */
 const initCarousels = () => {
-  document.querySelectorAll('.carousel').forEach((carousel) => {
+  document.querySelectorAll(".carousel").forEach((carousel) => {
     setupCarouselCells(carousel); // Position carousel cells in 3D
     carousel._timeline = createScrollAnimation(carousel); // Attach scroll animation timeline
   });
@@ -143,25 +146,40 @@ const initCarousels = () => {
  *
  * @returns {void}
  */
+
+const isTouch = window.matchMedia('(pointer: coarse)').matches;
+let lastWidth = 0;
+const setAppHeight = (force = false) => {
+  if (!force && isTouch && window.innerWidth === lastWidth) return;
+  lastWidth = window.innerWidth;
+  const root = document.documentElement;
+  const viewportH = window.innerHeight;
+  // Native scrolling is bounded by the layout viewport, which can exceed innerHeight on mobile
+  const extra = Math.max(root.clientHeight, viewportH) - viewportH;
+  root.style.setProperty('--app-h', `${viewportH}px`);
+  root.style.setProperty('--scroll-end-pad', `${Math.floor(extra / 2)}px`);
+};
+
 const init = () => {
+  setAppHeight(true);          // NEW, before anything is measured
   initTextsSplit();
   initCarousels();
 
-  // Mobile browsers can report a viewport width before the address bar
-  // settles; re-measure shortly after load to correct for that.
   setTimeout(() => {
+    setAppHeight(true);        // NEW: re-measure after the mobile URL bar settles
     document.querySelectorAll('.carousel').forEach(setupCarouselCells);
     ScrollTrigger.refresh();
   }, 300);
 
   window.addEventListener('resize', () => {
+    setAppHeight();            // NEW
     document.querySelectorAll('.carousel').forEach(setupCarouselCells);
     ScrollTrigger.refresh();
   });
-};;
+};
 
 // Start app once images are preloaded
-preloadImages('.card__face').then(() => {
-  document.body.classList.remove('loading'); // Remove loading state from body
+preloadImages(".card__face").then(() => {
+  document.body.classList.remove("loading"); // Remove loading state from body
   init(); // Begin initialization
 });
