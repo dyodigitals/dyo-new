@@ -200,6 +200,16 @@ a {
     line-height: 0; /* kills descender gap under inline SVG */
   }
 
+  .frame__tagline {
+    --tagline-w: clamp(170px, 46vw, 260px);
+    display: block;
+    width: var(--tagline-w);
+    height: auto;
+    /* The SVG has ~5% left padding; pull it back so the text aligns with the logo */
+    margin-left: calc(var(--tagline-w) * -0.05);
+    transition: filter 0.4s ease;
+  }
+
   .frame__links {
     grid-area: links;
     justify-self: end;
@@ -251,6 +261,11 @@ a {
 
 body.theme-dark .frame {
   --frame-color: #fff;
+}
+
+/* The artwork is dark ink, so flip it with the header color on dark moods */
+body.theme-dark .frame__tagline {
+  filter: invert(1);
 }
 
 /* Osmo "curved wipe" page transition, shared by index.html and contact.html.

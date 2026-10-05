@@ -8,6 +8,11 @@ body:has(.contact__page) {
   overflow: hidden;
 }
 
+/* Stand-in shown until the WebGL shader renders its first frame */
+html:has(.contact__gradient) {
+  background: linear-gradient(135deg, #f7f5ff 0%, #ddd7f5 45%, #c9ddf2 100%);
+}
+
 .contact__page {
   height: 100vh;
   height: 100svh;
@@ -152,6 +157,12 @@ body:has(.contact__page) {
   height: 100%;
   z-index: -1;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.contact__gradient.is-ready {
+  opacity: 1;
 }
 
 /* ==========================================================================
