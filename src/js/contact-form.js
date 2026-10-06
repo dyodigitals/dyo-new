@@ -116,6 +116,24 @@ function initNicheOther() {
   const otherInput = document.getElementById("niche-other-input");
   if (!otherWrap || !otherInput) return;
 
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  // Focusing while the wrapper is still collapsed (overflow: hidden, max-height: 0) makes the
+  // browser scroll its clipped content, and the focus underline would animate while still clipped.
+  // Waiting for the expand to finish makes it behave like every other field.
+  const focusWhenExpanded = () => {
+    if (reduceMotion.matches) {
+      otherInput.focus();
+      return;
+    }
+    const onEnd = (e) => {
+      if (e.target !== otherWrap || e.propertyName !== "max-height") return;
+      otherWrap.removeEventListener("transitionend", onEnd);
+      if (otherInput.required) otherInput.focus();
+    };
+    otherWrap.addEventListener("transitionend", onEnd);
+  };
+
   const sync = () => {
     const isOther = document.querySelector(
       'input[name="niche"][value="other"]',
@@ -123,7 +141,7 @@ function initNicheOther() {
     otherInput.required = !!isOther;
     otherWrap.classList.toggle("is-visible", !!isOther); // fallback for browsers without :has()
     if (isOther) {
-      requestAnimationFrame(() => otherInput.focus());
+      focusWhenExpanded();
     } else {
       otherInput.value = "";
     }

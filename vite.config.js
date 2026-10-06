@@ -39,7 +39,7 @@ const cleanUrls = () => {
 };
 
 export default defineConfig({
-  plugins: [glsl(), prefetchContactBundle(), cleanUrls()],
+  plugins: [glsl(), prefetchContactBundle()],
   build: {
     rollupOptions: {
       input: {

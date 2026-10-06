@@ -317,7 +317,9 @@ html:has(.contact__gradient) {
   opacity: 0;
   transform: translateY(-4px);
   margin-top: 0;
-  transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.35s ease, margin-top 0.35s ease;
+  /* The field's 0.5px underline sits on its bottom edge; without room here overflow clips it */
+  padding-bottom: 0;
+  transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.35s ease, margin-top 0.35s ease, padding-bottom 0.35s ease;
 }
 
 .contact__niche:has(input[value="other"]:checked) .niche__other,
@@ -326,6 +328,7 @@ html:has(.contact__gradient) {
   opacity: 1;
   transform: translateY(0);
   margin-top: clamp(0.75rem, 2svh, 1.25rem);
+  padding-bottom: 2px;
 }
 
 /* ==========================================================================
@@ -598,11 +601,36 @@ button.contact__submit {
 }
 
 /* ==========================================================================
-   Responsive — stack the columns; the page stays pinned to one viewport,
-   the form column becomes the scroll region if content runs long.
+   Responsive — stack the columns; below 900px the page scrolls naturally.
    ========================================================================== */
 @media (max-width: 899px) {
+  /* Stacked layout: release the one-viewport lock so the whole page scrolls naturally */
+  html:has(.contact__page) {
+    height: auto;
+    overflow-y: auto;
+  }
+
+  body:has(.contact__page) {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  .contact__page {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
+  /* Absolute would scroll away with the page, leaving the rest unpainted */
+  .contact__gradient {
+    position: fixed;
+  }
+
   .contact {
+    flex: 1 0 auto;
+    min-height: auto;
+    overflow: visible;
     align-items: flex-start;
     /* Clears the fixed header's logo so the stacked heading never collides with it */
     padding-top: calc(var(--page-padding) + clamp(40px, 9vw, 64px) + 0.75rem);
@@ -611,7 +639,9 @@ button.contact__submit {
 
   .contact__grid {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto;
+    height: auto;
+    max-height: none;
     gap: clamp(0.5rem, 1.2svh, 0.9rem);
   }
 
@@ -633,7 +663,8 @@ button.contact__submit {
   }
 
   .contact__form-col {
-    overflow-y: auto;
+    max-height: none;
+    overflow-y: visible;
   }
 }
 

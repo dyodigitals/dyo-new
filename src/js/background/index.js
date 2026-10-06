@@ -75,6 +75,8 @@ if (canvas instanceof HTMLCanvasElement) {
   resize();
   window.addEventListener('resize', resize);
 
+  const scratchColor = new THREE.Color();
+
   // Blends the background mood to match whichever project is centered in view
   const updateMoodFromProgress = (progress) => {
     const steps = Math.max(projectMoods.length - 1, 0);
@@ -85,14 +87,16 @@ if (canvas instanceof HTMLCanvasElement) {
     const from = projectMoods[index] ?? projectMoods[0];
     const to = projectMoods[index + 1] ?? from;
 
-    currentColors.background.set(from.background).lerp(new THREE.Color(to.background), blend);
-    currentColors.blob1.set(from.blob1).lerp(new THREE.Color(to.blob1), blend);
-    currentColors.blob2.set(from.blob2).lerp(new THREE.Color(to.blob2), blend);
+    currentColors.background.set(from.background).lerp(scratchColor.set(to.background), blend);
+    currentColors.blob1.set(from.blob1).lerp(scratchColor.set(to.blob1), blend);
+    currentColors.blob2.set(from.blob2).lerp(scratchColor.set(to.blob2), blend);
 
     // Keeps the fixed header/footer text readable against the current background
     const { r, g, b } = currentColors.background;
     const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    document.body.classList.toggle('theme-dark', luminance < 0.5);
+    // Hysteresis: leaving the dark theme needs a slightly lighter background than entering it
+    const threshold = document.body.classList.contains('theme-dark') ? 0.54 : 0.5;
+    document.body.classList.toggle('theme-dark', luminance < threshold);
   };
 
   ScrollTrigger.create({
