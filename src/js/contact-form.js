@@ -23,7 +23,19 @@ function initGlassSelects() {
     const valueEl = root.querySelector(".glass-select__value");
     const hiddenInput = root.querySelector('input[type="hidden"]');
     const options = Array.from(root.querySelectorAll(".glass-select__option"));
+    const noteEl = root.querySelector(".glass-select__note");
     let activeIndex = -1;
+    let noteTimer;
+
+    // Fades the old caption out before swapping in the new one
+    const showNote = (text) => {
+      clearTimeout(noteTimer);
+      noteEl.classList.remove("is-visible");
+      noteTimer = setTimeout(() => {
+        noteEl.textContent = text;
+        noteEl.classList.add("is-visible");
+      }, 200);
+    };
 
     // Panel is portalled to <body> with fixed positioning so it can never be
     // clipped by the scrolling form column, which was blocking mouse clicks
@@ -72,8 +84,11 @@ function initGlassSelects() {
     const selectOption = (option) => {
       options.forEach((o) => o.setAttribute("aria-selected", "false"));
       option.setAttribute("aria-selected", "true");
-      valueEl.textContent = option.textContent;
+      valueEl.textContent = option.querySelector(
+        ".glass-select__label",
+      ).textContent;
       valueEl.classList.remove("is-placeholder");
+      showNote(option.querySelector(".glass-select__hint").textContent.trim());
       hiddenInput.value = option.dataset.value;
       root.classList.remove("is-invalid");
       close();
@@ -275,5 +290,6 @@ function resetGlassSelects() {
       .querySelectorAll(".glass-select__option")
       .forEach((o) => o.setAttribute("aria-selected", "false"));
     root.querySelector('input[type="hidden"]').value = "";
+    root.querySelector(".glass-select__note")?.classList.remove("is-visible");
   });
 }

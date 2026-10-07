@@ -1,114 +1,179 @@
-# Contact Page — Fixes & Improvements
+# UX Exploration — Anticipated Budget / Pricing Guidance
 
-Go through the **Contact page thoroughly** and make the following changes/fixes.
+Okay, so looking at the **Contact page and Home page together**, it should be clear that the website is intentionally **very minimal and straightforward**.
 
-## 1. Fix the DYO Digitals Logo
+There is very little informational content on the site:
 
-The **DYO Digitals logo on the Contact page is incorrect/incomplete**.
+- The Home page primarily acts as a portfolio/work display.
+- The user explores the work.
+- They are then directed toward the Contact page.
+- The Contact page is where we collect the information needed to start a conversation.
 
-The word **"Digitals"** is missing from the Contact page logo, whereas it is correctly present on the Home page.
+I want to preserve this overall philosophy. I **do not want to turn the website into a traditional agency website filled with sections, explanations, packages, pricing tables, FAQs, etc.**
 
-Please:
-
-- Compare the Contact page logo implementation with the Home page.
-- Identify why "Digitals" is missing on the Contact page.
-- Fix it so the Contact page displays the **same complete DYO Digitals logo/branding as the Home page**.
-- Preserve the existing sizing, positioning, and styling of the Contact page unless the missing text requires a small adjustment.
+However, there is one UX issue I want to think through carefully.
 
 ---
 
-## 2. Update "My Craft Is" Fields
+## The Problem — Anticipated Budget
 
-In the **"My Craft Is"** section of the Contact form:
+On the Contact page, we currently have a dropdown asking the user for their **anticipated budget**.
 
-### Current
-- Live Painting
+We intentionally **do not want to list direct packages** because I feel that presenting things like:
 
-### Change to
-- Wedding Floral
+> Basic — $X  
+> Standard — $Y  
+> Premium — $Z
 
-Please remove **Live Painting** from the visible craft options and replace it with **Wedding Floral**.
+would make the agency feel less premium and more like a productized service.
 
-However, **Live Painting should be moved into the placeholder/example text for the "Other" field**.
+But if we simply give users a few budget ranges without any context, there is another UX problem:
 
-So the "Other" field should communicate that Live Painting is an example of something the user can enter there.
+**The user may not know what each budget range actually corresponds to.**
 
-Please maintain the existing visual styling and interaction behavior of the other craft fields.
+For example, if someone sees:
 
----
+- $2,000–$4,000
+- $4,000–$7,000
+- $7,000–$12,000
+- $12,000+
 
-## 3. Fix the Active Underline on the "Other" Field
+they may reasonably wonder:
 
-The **active underline behavior for the "Other" field is glitchy**.
+> "What exactly am I getting at each of these levels?"
 
-It does not behave consistently with the remaining fields in the form.
-
-Please inspect how the active underline/focus state is implemented for the other fields and compare it directly with the "Other" field.
-
-Fix it so that the **"Other" field behaves exactly like the other fields**, including:
-
-- Active/focused state
-- Underline animation
-- Underline positioning
-- Transition timing
-- Hover/focus behavior
-- Returning to the inactive state when appropriate
-
-Do not create a separate workaround if the issue is caused by the "Other" field being implemented differently. Prefer making it follow the same underlying implementation/pattern as the other fields.
+We don't necessarily want to answer that with rigid packages, but we **do need to give the user enough context to make an informed selection.**
 
 ---
 
-## 4. Mobile Contact Form — Check for Fixed/Sticky Positioning & 100svh Restriction
+# Solution Ideas I've Considered
 
-Please thoroughly inspect the **mobile version of the Contact page**, specifically the section containing:
+I have two initial ideas, but neither is necessarily the final solution.
 
-- Contact Us
-- Email
-- The contact form and its surrounding content
+## Option 1 — Contextual Explanation While Selecting a Budget
 
-I want to determine whether any of this content is currently using:
+When the user interacts with the budget dropdown and selects/hover over a particular range, we could show a small contextual explanation somewhere on the page.
 
-- `position: fixed`
-- `position: sticky`
-- A fixed-height container
-- `100svh`
-- `100vh`
-- `overflow: hidden`
-- Or any other implementation that effectively restricts the Contact page to only one viewport height.
+For example:
 
-### Desired behavior
+> **$2,000–$4,000**  
+> Choose this range if you're primarily looking to get a focused website designed and developed.
 
-If the mobile Contact page is currently being restricted to **100svh / one viewport height** or using sticky/fixed positioning in a way that prevents natural scrolling:
+Another range could say something like:
 
-**Remove that restriction.**
+> **$7,000–$12,000**  
+> Suitable if you're looking for a more custom digital experience with additional interactions, motion, and a more involved creative direction.
 
-The user should be able to:
+And so on.
 
-- Scroll naturally through the entire Contact page.
-- Continue scrolling **past the initial viewport**.
-- Reach all of the form content and anything below it.
-- Have the page behave like a normal vertically scrollable mobile page.
+The idea is **not to describe a package**, but rather to explain the **type of project that generally makes sense within that budget.**
 
-Do **not** remove legitimate sticky/fixed positioning if it is not actually causing the problem.
+This could be very subtle and integrated into the existing form rather than feeling like additional content.
 
-### Important
+### Potential concern
 
-If you inspect the implementation and determine that:
+I'm not sure how elegant this would be from a UX perspective, especially if we're relying on hover.
 
-- There is **no sticky/fixed positioning**, and
-- The page is **not actually restricted to 100svh / one viewport height**, and
-- Nothing is preventing normal mobile scrolling,
-
-then **ignore this issue and do not make any changes for it**.
+It also needs to work properly on **mobile**, where hover doesn't really exist.
 
 ---
 
-## Important Overall Requirements
+# Option 2 — Pricing Guide
 
-- Thoroughly inspect the existing Contact page implementation before making changes.
-- Compare the Contact page with the Home page where relevant, especially for the DYO Digitals logo.
-- Preserve the existing design, animations, typography, spacing, and interactions unless a change is specifically required above.
-- Do not introduce unnecessary refactoring.
-- Fix the underlying implementation rather than applying visual hacks.
-- Make sure the Contact page remains responsive across desktop and mobile.
-- Do not change the Home page unless it is necessary to understand or correctly replicate the existing logo implementation.
+Another idea is to have a small **"Pricing Guide"** button somewhere around the bottom-right of the Contact page.
+
+Clicking it could open a modal containing a concise explanation of the different budget ranges.
+
+For example:
+
+### $2k–$4k
+Focused website projects and simpler digital experiences.
+
+### $4k–$7k
+More custom design, development, interaction, and creative direction.
+
+### $7k–$12k
+Highly customized experiences with more involved motion, interaction, and development.
+
+### $12k+
+Larger or highly bespoke digital projects.
+
+The important thing is that this should **not feel like a pricing page or package comparison table.**
+
+It should feel more like:
+
+> **"Here's how to think about the budget you're selecting."**
+
+And if we do use a modal, it needs to feel **designed**.
+
+I don't want a generic centered white box containing four paragraphs of text.
+
+It should feel consistent with the rest of the website:
+
+- Minimal
+- Premium
+- Typographic
+- Intentional
+- Visually interesting
+- Very little unnecessary information
+- Appropriate animation/transitions
+- Consistent with the existing visual language
+
+---
+
+# But I'm Open to Better Ideas
+
+These are just my initial thoughts.
+
+I want you to **think through the UX problem itself before deciding on an implementation.**
+
+The actual problem we're trying to solve is:
+
+> **How do we help a potential client understand which budget range makes sense for their project without turning the website into a traditional agency pricing page or making the experience feel less premium?**
+
+Please explore this from a UX perspective and propose the strongest solution.
+
+Think about things such as:
+
+- What information does the user actually need to make this decision?
+- How much information is too much for a website this minimal?
+- Should the explanation happen **before**, **during**, or **after** they interact with the budget field?
+- Is contextual information better than a separate pricing guide?
+- Would a modal interrupt the flow too much?
+- Could the budget ranges themselves communicate enough information?
+- Could we use project types / scope rather than "packages"?
+- Is there a more elegant way to communicate pricing expectations without explicitly explaining every tier?
+- How should this work on both desktop and mobile?
+- How can we preserve the feeling that we're selling **custom creative work**, rather than predefined products?
+
+---
+
+# One Important Constraint
+
+I don't want the solution to become overly complicated.
+
+If there is a **very simple interaction** that solves the problem elegantly, I would prefer that over building a large feature.
+
+However, if a modal, overlay, or another more involved interaction genuinely creates a better experience, I'm completely open to it — **provided that it feels like a natural part of the website's design rather than an information dump.**
+
+The visual execution matters just as much as the UX.
+
+---
+
+# What I Want From You
+
+Before implementing anything, **think through the different possible approaches and discuss them with me.**
+
+Give me your recommendation for:
+
+1. **What you think is the best UX solution**
+2. **Why you think it is better than the alternatives**
+3. **How you would handle it on desktop**
+4. **How you would handle it on mobile**
+5. **What the interaction would actually look/feel like**
+6. **What the content should communicate**
+7. **How we can keep it aligned with the minimal/premium aesthetic of the website**
+
+I'm **not committed to either of my two ideas**.
+
+Let's explore the problem properly and iterate until we land on the solution that feels most natural for this particular website.

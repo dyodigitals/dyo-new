@@ -192,6 +192,8 @@ html:has(.contact__gradient) {
 .form__row {
   display: grid;
   grid-template-columns: 1fr;
+  /* Keeps a field from stretching to the taller budget caption beside it */
+  align-items: start;
   gap: clamp(1.1rem, 2.6svh, 1.9rem);
 }
 
@@ -556,6 +558,9 @@ button.contact__submit {
 }
 
 .glass-select__option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
   padding: 0.6rem 0.9rem;
   border-radius: 0.9rem;
   font-size: 0.85rem;
@@ -570,8 +575,41 @@ button.contact__submit {
   background-color: rgba(255, 255, 255, 0.55);
 }
 
-.glass-select__option[aria-selected="true"] {
+.glass-select__option[aria-selected="true"] .glass-select__label {
   font-weight: 700;
+}
+
+.glass-select__hint,
+.glass-select__note {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.glass-select__hint {
+  opacity: 0.65;
+}
+
+/* Caption under the trigger; collapsed until a range is picked */
+.glass-select__note {
+  margin: 0;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  padding-inline: 1.25rem;
+  transform: translateY(-4px);
+  transition: max-height 0.4s ease, opacity 0.4s ease, margin-top 0.4s ease,
+    transform 0.5s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+.glass-select__note.is-visible {
+  max-height: 4.5rem;
+  opacity: 0.75;
+  margin-top: 0.75rem;
+  transform: none;
 }
 
 .glass-select__error {
@@ -728,6 +766,7 @@ button.contact__submit {
   .contact__field::after,
   .glass-select__panel,
   .glass-select__chevron,
+  .glass-select__note,
   .niche__other,
   .glass-select.is-invalid .glass-select__trigger {
     transition: none !important;
