@@ -645,7 +645,10 @@ button.contact__submit {
   /* Stacked layout: release the one-viewport lock so the whole page scrolls naturally */
   html:has(.contact__page) {
     height: auto;
-    overflow-y: auto;
+    min-height: 100%;
+    /* clip (unlike hidden) doesn't force overflow-y to auto, so the viewport scrolls natively on touch */
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   body:has(.contact__page) {

@@ -44,11 +44,36 @@ function initGlassSelects() {
 
     const positionPanel = () => {
       const rect = trigger.getBoundingClientRect();
+      const gap = 10;
+      const margin = 12;
       panel.style.position = "fixed";
       panel.style.right = "auto";
-      panel.style.top = `${rect.bottom + 10}px`;
       panel.style.left = `${rect.left}px`;
       panel.style.width = `${rect.width}px`;
+      panel.style.maxHeight = "none";
+
+      // Fixed panels can't be page-scrolled, so flip above or cap the height and scroll inside it
+      const vh = window.innerHeight;
+      const below = vh - rect.bottom - gap - margin;
+      const above = rect.top - gap - margin;
+      const needed = panel.offsetHeight;
+      const flip = needed > below && above > below;
+      const room = flip ? above : below;
+
+      panel.style.maxHeight = `${Math.max(room, 120)}px`;
+      panel.style.overflowY = "auto";
+      panel.style.overscrollBehavior = "contain";
+      if (flip) {
+        panel.style.top = "auto";
+        panel.style.bottom = `${vh - rect.top + gap}px`;
+      } else {
+        panel.style.bottom = "auto";
+        panel.style.top = `${rect.bottom + gap}px`;
+      }
+    };
+
+    const onScroll = (e) => {
+      if (e.target !== panel) positionPanel();
     };
 
     const focusOption = (i) => {
@@ -63,13 +88,13 @@ function initGlassSelects() {
       panel.hidden = true;
       trigger.setAttribute("aria-expanded", "false");
       root.classList.remove("is-open");
-      window.removeEventListener("scroll", positionPanel, true);
+      window.removeEventListener("scroll", onScroll, true);
       window.removeEventListener("resize", positionPanel);
     };
 
     const open = () => {
-      positionPanel();
       panel.hidden = false;
+      positionPanel();
       trigger.setAttribute("aria-expanded", "true");
       root.classList.add("is-open");
       root.classList.remove("is-invalid");
@@ -77,7 +102,7 @@ function initGlassSelects() {
         (o) => o.getAttribute("aria-selected") === "true",
       );
       focusOption(selectedIndex >= 0 ? selectedIndex : 0);
-      window.addEventListener("scroll", positionPanel, true);
+      window.addEventListener("scroll", onScroll, true);
       window.addEventListener("resize", positionPanel);
     };
 
